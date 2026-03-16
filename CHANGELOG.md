@@ -14,6 +14,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.0.3] - 2026-03-16
+
+#### Fixed
+
+- Added missing 1.0.2 release notes to CHANGELOG.md
+- Fixed pub.dev validation warning about missing current version documentation
+
+### [1.0.2] - 2026-03-16
+
+#### Added
+
+- Complete DartDoc documentation for all 55 API elements (100% coverage)
+- Library-level documentation with quick start examples
+- GitHub Actions workflow for automatic pub.dev publishing
+- Comprehensive pub.dev setup and configuration guide
+- Release notes and improvement summary documentation
+
+#### Changed
+
+- Updated `device_info_plus` from ^11.0.0 to ^12.0.0
+- Updated `package_info_plus` from ^8.0.0 to ^9.0.0
+- Enhanced example app with individual security checks dialog
+- Improved example app statistics display
+- Better code formatting and style consistency
+
+#### Fixed
+
+- Removed deprecated `encryptedSharedPreferences` parameter from SecureStorage
+- Fixed missing DartDoc comments for SecurityCheckResult and SecurityReport classes
+- Fixed Icons.warning_circle reference (changed to Icons.warning)
+- Fixed unnecessary_library_name linter warning
+
+#### Improved
+
+- Pub.dev score increased from 120/160 to 150+/160
+- All code passes flutter analyze without issues
+- All tests pass with 100% success rate
+- Complete API documentation with usage examples
+
 ### [1.0.1] - 2026-03-16
 
 #### Added
@@ -190,6 +229,45 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 日志格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 项目版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+
+### [1.0.3] - 2026-03-16
+
+#### 修复
+
+- 添加了缺失的 1.0.2 发布说明到 CHANGELOG.md
+- 修复了 pub.dev 验证警告（缺少当前版本文档）
+
+### [1.0.2] - 2026-03-16
+
+#### 新增功能
+
+- 为所有 55 个 API 元素添加了完整的 DartDoc 文档（100% 覆盖）
+- 添加了库级文档和快速开始示例
+- GitHub Actions 自动发布到 pub.dev 的工作流
+- 全面的 pub.dev 设置和配置指南
+- 发布说明和改进总结文档
+
+#### 变更
+
+- 将 `device_info_plus` 从 ^11.0.0 更新到 ^12.0.0
+- 将 `package_info_plus` 从 ^8.0.0 更新到 ^9.0.0
+- 增强了示例应用的单项安全检查对话框
+- 改进了示例应用的统计显示
+- 更好的代码格式化和风格一致性
+
+#### 修复
+
+- 从 SecureStorage 中移除了弃用的 `encryptedSharedPreferences` 参数
+- 修复了 SecurityCheckResult 和 SecurityReport 类缺失的 DartDoc 注释
+- 修复了 Icons.warning_circle 引用（改为 Icons.warning）
+- 修复了 unnecessary_library_name linter 警告
+
+#### 改进
+
+- Pub.dev 评分从 120/160 提升到 150+/160
+- 所有代码通过 flutter analyze 检查，无任何问题
+- 所有测试通过，成功率 100%
+- 完整的 API 文档和使用示例
 
 ### [1.0.1] - 2026-03-16
 
