@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Device Security Kit Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const HomePage(),
@@ -35,6 +35,8 @@ class _HomePageState extends State<HomePage> {
   DeviceSecurityInfo? _securityInfo;
   bool _isLoading = false;
   String? _storedValue;
+  int _checkCount = 0;
+  DateTime? _lastCheckTime;
 
   @override
   void initState() {
@@ -50,23 +52,27 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _securityInfo = info;
         _isLoading = false;
+        _checkCount++;
+        _lastCheckTime = DateTime.now();
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      _showError('安全检查失败: $e');
+      _showError('Security check failed: $e');
     }
   }
 
   Future<void> _testSecureStorage() async {
     try {
-      // 写入测试数据
+      final testValue = 'Secure Data - ${DateTime.now().millisecondsSinceEpoch}';
+      
+      // Write encrypted data
       await _storage.write(
         key: 'test_key',
-        value: 'Hello, Secure World!',
+        value: testValue,
         encrypt: true,
       );
 
-      // 读取测试数据
+      // Read encrypted data
       final value = await _storage.read(
         key: 'test_key',
         decrypt: true,
@@ -76,11 +82,14 @@ class _HomePageState extends State<HomePage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('存储测试成功: $value')),
+          SnackBar(
+            content: Text('Storage test successful: $value'),
+            backgroundColor: Colors.green,
+          ),
         );
       }
     } catch (e) {
-      _showError('存储测试失败: $e');
+      _showError('Storage test failed: $e');
     }
   }
 
@@ -91,12 +100,126 @@ class _HomePageState extends State<HomePage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('存储已清空')),
+          const SnackBar(
+            content: Text('Storage cleared'),
+            backgroundColor: Colors.blue,
+          ),
         );
       }
     } catch (e) {
-      _showError('清空失败: $e');
+      _showError('Clear failed: $e');
     }
+  }
+
+  Future<void> _testIndividualChecks() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final results = <String, SecurityCheckResult>{};
+      
+      results['Root'] = await _security.checkRoot();
+      results['Debugger'] = await _security.checkDebugger();
+      results['Emulator'] = await _security.checkEmulator();
+      results['Proxy'] = await _security.checkProxy();
+      results['VPN'] = await _security.checkVPN();
+
+      if (mounted) {
+        _showDetailedResults(results);
+      }
+    } catch (e) {
+      _showError('Individual checks failed: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _showDetailedResults(Map<String, SecurityCheckResult> results) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Individual Security Checks'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: results.entries.map((entry) {
+              final check = entry.value;
+              final color = _getRiskColor(check.riskLevel);
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: color),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            entry.key,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'Risk: ${check.riskLevel}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        check.details ?? 'No details',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Secure: ${check.isSecure ? 'Yes' : 'No'}',
+                        style: TextStyle(
+                          color: check.isSecure ? Colors.green : Colors.red,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showError(String message) {
@@ -110,17 +233,25 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Color _getRiskColor(int riskLevel) {
+    if (riskLevel >= 7) return Colors.red;
+    if (riskLevel >= 4) return Colors.orange;
+    if (riskLevel >= 1) return Colors.yellow;
+    return Colors.green;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Device Security Kit Demo'),
+        title: const Text('Device Security Kit'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _checkSecurity,
-            tooltip: '重新检查',
+            tooltip: 'Refresh',
           ),
         ],
       ),
@@ -136,6 +267,10 @@ class _HomePageState extends State<HomePage> {
                   _buildSecurityChecksCard(),
                   const SizedBox(height: 16),
                   _buildStorageTestCard(),
+                  const SizedBox(height: 16),
+                  _buildStatsCard(),
+                  const SizedBox(height: 16),
+                  _buildActionButtonsCard(),
                 ],
               ),
             ),
@@ -147,7 +282,7 @@ class _HomePageState extends State<HomePage> {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(16),
-          child: Text('暂无安全信息'),
+          child: Text('No security information available'),
         ),
       );
     }
@@ -162,33 +297,34 @@ class _HomePageState extends State<HomePage> {
     if (score >= 80) {
       scoreColor = Colors.green;
       scoreIcon = Icons.shield;
-      scoreText = '安全';
+      scoreText = 'Secure';
     } else if (score >= 60) {
       scoreColor = Colors.orange;
       scoreIcon = Icons.warning;
-      scoreText = '警告';
+      scoreText = 'Warning';
     } else {
       scoreColor = Colors.red;
       scoreIcon = Icons.dangerous;
-      scoreText = '危险';
+      scoreText = 'Danger';
     }
 
     return Card(
+      elevation: 4,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             Icon(scoreIcon, size: 64, color: scoreColor),
             const SizedBox(height: 16),
             Text(
-              '安全评分',
+              'Security Score',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             Text(
               '$score',
               style: TextStyle(
-                fontSize: 48,
+                fontSize: 56,
                 fontWeight: FontWeight.bold,
                 color: scoreColor,
               ),
@@ -199,6 +335,16 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 20,
                 color: scoreColor,
                 fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: score / 100,
+                minHeight: 8,
+                backgroundColor: Colors.grey[300],
+                valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
               ),
             ),
             const SizedBox(height: 16),
@@ -216,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '检测到高风险项！',
+                        'High-risk items detected!',
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
@@ -233,13 +379,14 @@ class _HomePageState extends State<HomePage> {
     if (_securityInfo == null) return const SizedBox();
 
     return Card(
+      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '安全检查详情',
+              'Security Check Details',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -260,28 +407,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildCheckItem(SecurityCheckResult check) {
-    Color color;
-    IconData icon;
-
-    if (check.isHighRisk) {
-      color = Colors.red;
-      icon = Icons.dangerous;
-    } else if (check.isMediumRisk) {
-      color = Colors.orange;
-      icon = Icons.warning;
-    } else if (check.isLowRisk) {
-      color = Colors.yellow;
-      icon = Icons.info;
-    } else {
-      color = Colors.green;
-      icon = Icons.check_circle;
-    }
+    final color = _getRiskColor(check.riskLevel);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 32),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              check.isSecure ? Icons.check_circle : Icons.warning_circle,
+              color: color,
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -291,7 +434,7 @@ class _HomePageState extends State<HomePage> {
                   _getCheckTitle(check.checkType),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 15,
                   ),
                 ),
                 if (check.details != null)
@@ -299,24 +442,25 @@ class _HomePageState extends State<HomePage> {
                     check.details!,
                     style: TextStyle(
                       color: Colors.grey[600],
-                      fontSize: 14,
+                      fontSize: 13,
                     ),
                   ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: color),
             ),
             child: Text(
-              '风险: ${check.riskLevel}',
+              'L${check.riskLevel}',
               style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.bold,
+                fontSize: 12,
               ),
             ),
           ),
@@ -327,13 +471,14 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildStorageTestCard() {
     return Card(
+      elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '安全存储测试',
+              'Secure Storage Test',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -350,9 +495,26 @@ class _HomePageState extends State<HomePage> {
                     const Icon(Icons.check_circle, color: Colors.green),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        '存储的值: $_storedValue',
-                        style: const TextStyle(color: Colors.green),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Stored Value:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            _storedValue!,
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -365,11 +527,7 @@ class _HomePageState extends State<HomePage> {
                   child: ElevatedButton.icon(
                     onPressed: _testSecureStorage,
                     icon: const Icon(Icons.save),
-                    label: const Text('测试存储'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
+                    label: const Text('Test Storage'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -377,7 +535,7 @@ class _HomePageState extends State<HomePage> {
                   child: ElevatedButton.icon(
                     onPressed: _clearStorage,
                     icon: const Icon(Icons.delete),
-                    label: const Text('清空存储'),
+                    label: const Text('Clear'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
@@ -392,22 +550,126 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildStatsCard() {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Statistics',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatItem(
+                  'Checks',
+                  _checkCount.toString(),
+                  Icons.check_circle,
+                  Colors.blue,
+                ),
+                _buildStatItem(
+                  'Last Check',
+                  _lastCheckTime != null
+                      ? '${_lastCheckTime!.hour}:${_lastCheckTime!.minute.toString().padLeft(2, '0')}'
+                      : 'N/A',
+                  Icons.schedule,
+                  Colors.purple,
+                ),
+                _buildStatItem(
+                  'Score',
+                  _securityInfo?.securityScore.toString() ?? 'N/A',
+                  Icons.trending_up,
+                  Colors.green,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 32),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtonsCard() {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Advanced Actions',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _testIndividualChecks,
+                icon: const Icon(Icons.analytics),
+                label: const Text('Run Individual Checks'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _getCheckTitle(String checkType) {
     switch (checkType) {
       case 'root':
-        return 'Root 检测';
+        return 'Root Detection';
       case 'jailbreak':
-        return '越狱检测';
+        return 'Jailbreak Detection';
       case 'debugger':
-        return '调试器检测';
+        return 'Debugger Detection';
       case 'emulator':
-        return '模拟器检测';
+        return 'Emulator Detection';
       case 'simulator':
-        return '模拟器检测';
+        return 'Simulator Detection';
       case 'proxy':
-        return '代理检测';
+        return 'Proxy Detection';
       case 'vpn':
-        return 'VPN 检测';
+        return 'VPN Detection';
       default:
         return checkType;
     }

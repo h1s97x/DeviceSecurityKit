@@ -1,7 +1,28 @@
 import 'security_check_result.dart';
 
-/// 设备安全综合信息
+/// Comprehensive device security information model.
+///
+/// This class aggregates all security check results and provides an overall
+/// security score and assessment. It includes results from root/jailbreak,
+/// debugger, emulator, proxy, and VPN checks.
+///
+/// The security score ranges from 0 to 100, where 100 is the most secure.
+/// A score of 70 or higher is considered secure.
+///
+/// Example:
+/// ```dart
+/// final security = DeviceSecurity();
+/// final info = await security.getSecurityInfo();
+/// print('Security Score: ${info.securityScore}');
+/// print('Is Secure: ${info.isSecure}');
+/// print('Has High Risk: ${info.hasHighRisk}');
+/// ```
 class DeviceSecurityInfo {
+  /// Creates a new DeviceSecurityInfo instance.
+  ///
+  /// All check results are optional. If not provided, they will be null.
+  /// The security score is automatically calculated based on the provided checks.
+  /// The timestamp defaults to the current time if not provided.
   DeviceSecurityInfo({
     this.rootCheck,
     this.debuggerCheck,
@@ -18,6 +39,20 @@ class DeviceSecurityInfo {
         ),
         timestamp = timestamp ?? DateTime.now();
 
+  /// Creates a DeviceSecurityInfo instance from a JSON map.
+  ///
+  /// This factory constructor is useful for deserializing security information
+  /// that was previously serialized to JSON.
+  ///
+  /// Example:
+  /// ```dart
+  /// final json = {
+  ///   'rootCheck': {...},
+  ///   'debuggerCheck': {...},
+  ///   'timestamp': '2026-03-16T10:30:00.000Z'
+  /// };
+  /// final info = DeviceSecurityInfo.fromJson(json);
+  /// ```
   factory DeviceSecurityInfo.fromJson(Map<String, dynamic> json) {
     return DeviceSecurityInfo(
       rootCheck: json['rootCheck'] != null
@@ -99,6 +134,20 @@ class DeviceSecurityInfo {
     return (100 - (avgRisk * 10)).clamp(0, 100).toInt();
   }
 
+  /// Converts this DeviceSecurityInfo instance to a JSON map.
+  ///
+  /// This method serializes all security check results and metadata to a JSON
+  /// representation that can be stored or transmitted.
+  ///
+  /// Returns a map containing all security information with ISO 8601 formatted
+  /// timestamp.
+  ///
+  /// Example:
+  /// ```dart
+  /// final info = await security.getSecurityInfo();
+  /// final json = info.toJson();
+  /// final jsonString = jsonEncode(json);
+  /// ```
   Map<String, dynamic> toJson() {
     return {
       'rootCheck': rootCheck?.toJson(),

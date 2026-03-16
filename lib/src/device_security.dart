@@ -3,10 +3,24 @@ import 'package:flutter/foundation.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'models/models.dart';
 
-/// 设备安全检测器
+/// Device security detector for comprehensive security checks.
+///
+/// This class provides a singleton instance for performing various security
+/// checks on the device including root/jailbreak detection, debugger detection,
+/// emulator detection, proxy detection, and VPN detection.
+///
+/// Usage:
+/// ```dart
+/// final security = DeviceSecurity();
+/// final rootCheck = await security.checkRoot();
+/// final securityInfo = await security.getSecurityInfo();
+/// ```
 class DeviceSecurity {
   DeviceSecurity._internal();
+
+  /// Returns the singleton instance of DeviceSecurity.
   factory DeviceSecurity() => _instance;
+
   static final DeviceSecurity _instance = DeviceSecurity._internal();
 
   final _deviceInfo = DeviceInfoPlugin();
