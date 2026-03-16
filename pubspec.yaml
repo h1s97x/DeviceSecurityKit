@@ -1,7 +1,9 @@
 name: device_security_kit
 description: A comprehensive device security toolkit for Flutter with root/jailbreak detection, debugger detection, emulator detection, and more.
-version: 1.0.3
+version: 1.0.4
 homepage: https://github.com/h1s97x/DeviceSecurityKit
+repository: https://github.com/h1s97x/DeviceSecurityKit
+issue_tracker: https://github.com/h1s97x/DeviceSecurityKit/issues
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

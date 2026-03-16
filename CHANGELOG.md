@@ -14,6 +14,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.0.4] - 2026-03-16
+
+#### Added
+
+- Multi-platform support for Windows, macOS, Linux, and Web
+- Windows C++ FFI implementation with debugger, proxy, and VPN detection
+- macOS Swift implementation with debugger, proxy, and VPN detection
+- Linux C++ FFI implementation with debugger, proxy, and VPN detection
+- Web Dart implementation with secure storage support
+- Comprehensive platform support documentation
+- Platform-specific build and test instructions
+
+#### Changed
+
+- Updated pubspec.yaml to support all Flutter platforms
+- Enhanced README with detailed platform support table
+- Improved platform detection and graceful fallbacks
+
+#### Improved
+
+- Pub.dev score increased from 150/160 to 160/160 (estimated)
+- Platform support coverage: 2 platforms → 6 platforms
+- All platforms now support secure storage
+- Better cross-platform compatibility
+
 ### [1.0.3] - 2026-03-16
 
 #### Fixed
@@ -229,6 +254,31 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 日志格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 项目版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+
+### [1.0.4] - 2026-03-16
+
+#### 新增功能
+
+- 添加了 Windows、macOS、Linux 和 Web 的多平台支持
+- Windows C++ FFI 实现，支持调试器、代理和 VPN 检测
+- macOS Swift 实现，支持调试器、代理和 VPN 检测
+- Linux C++ FFI 实现，支持调试器、代理和 VPN 检测
+- Web Dart 实现，支持安全存储
+- 全面的平台支持文档
+- 平台特定的构建和测试说明
+
+#### 变更
+
+- 更新 pubspec.yaml 支持所有 Flutter 平台
+- 增强了 README 的平台支持表格
+- 改进了平台检测和优雅的降级处理
+
+#### 改进
+
+- Pub.dev 评分从 150/160 提升到 160/160（预期）
+- 平台支持覆盖：2 个平台 → 6 个平台
+- 所有平台现在都支持安全存储
+- 更好的跨平台兼容性
 
 ### [1.0.3] - 2026-03-16
 
