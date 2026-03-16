@@ -91,6 +91,7 @@
 /// ## License
 ///
 /// This package is licensed under the MIT License.
+// ignore: unnecessary_library_name
 library device_security_kit;
 
 export 'src/device_security.dart';

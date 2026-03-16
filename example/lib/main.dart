@@ -422,7 +422,7 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              check.isSecure ? Icons.check_circle : Icons.warning_circle,
+              check.isSecure ? Icons.check_circle : Icons.warning,
               color: color,
             ),
           ),
