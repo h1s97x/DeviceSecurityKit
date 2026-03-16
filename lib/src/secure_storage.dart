@@ -15,16 +15,16 @@ import 'package:crypto/crypto.dart';
 /// Usage:
 /// ```dart
 /// final storage = SecureStorage();
-/// 
+///
 /// // Write encrypted data
 /// await storage.write(key: 'token', value: 'secret', encrypt: true);
-/// 
+///
 /// // Read encrypted data
 /// final token = await storage.read(key: 'token', decrypt: true);
-/// 
+///
 /// // Write JSON object
 /// await storage.writeJson(key: 'user', value: {'id': 1, 'name': 'John'});
-/// 
+///
 /// // Read JSON object
 /// final user = await storage.readJson(key: 'user');
 /// ```

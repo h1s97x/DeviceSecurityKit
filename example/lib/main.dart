@@ -63,8 +63,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _testSecureStorage() async {
     try {
-      final testValue = 'Secure Data - ${DateTime.now().millisecondsSinceEpoch}';
-      
+      final testValue =
+          'Secure Data - ${DateTime.now().millisecondsSinceEpoch}';
+
       // Write encrypted data
       await _storage.write(
         key: 'test_key',
@@ -116,7 +117,7 @@ class _HomePageState extends State<HomePage> {
 
     try {
       final results = <String, SecurityCheckResult>{};
-      
+
       results['Root'] = await _security.checkRoot();
       results['Debugger'] = await _security.checkDebugger();
       results['Emulator'] = await _security.checkEmulator();
@@ -145,7 +146,7 @@ class _HomePageState extends State<HomePage> {
             children: results.entries.map((entry) {
               final check = entry.value;
               final color = _getRiskColor(check.riskLevel);
-              
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Container(
