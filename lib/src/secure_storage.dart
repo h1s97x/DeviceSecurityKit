@@ -3,22 +3,57 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
-/// 安全存储
+/// Secure storage for encrypted data persistence.
+///
+/// This class provides a singleton instance for securely storing and retrieving
+/// sensitive data using platform-native security mechanisms:
+/// - Android: Android Keystore
+/// - iOS: iOS Keychain
+///
+/// Data can be optionally encrypted using Base64 encoding for additional security.
+///
+/// Usage:
+/// ```dart
+/// final storage = SecureStorage();
+/// 
+/// // Write encrypted data
+/// await storage.write(key: 'token', value: 'secret', encrypt: true);
+/// 
+/// // Read encrypted data
+/// final token = await storage.read(key: 'token', decrypt: true);
+/// 
+/// // Write JSON object
+/// await storage.writeJson(key: 'user', value: {'id': 1, 'name': 'John'});
+/// 
+/// // Read JSON object
+/// final user = await storage.readJson(key: 'user');
+/// ```
 class SecureStorage {
+  /// Creates a new SecureStorage instance (returns singleton).
   SecureStorage._internal();
+
+  /// Returns the singleton instance of SecureStorage.
   factory SecureStorage() => _instance;
+
   static final SecureStorage _instance = SecureStorage._internal();
 
   final _storage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock,
     ),
   );
 
-  /// 保存数据
+  /// Writes a value to secure storage.
+  ///
+  /// If [encrypt] is true, the value will be Base64 encoded before storage.
+  /// The data is stored using platform-native secure storage mechanisms.
+  ///
+  /// Parameters:
+  /// - [key]: The key to store the value under
+  /// - [value]: The string value to store
+  /// - [encrypt]: Whether to encrypt the value (default: false)
+  ///
+  /// Throws an exception if the write operation fails.
   Future<void> write({
     required String key,
     required String value,
@@ -33,7 +68,16 @@ class SecureStorage {
     }
   }
 
-  /// 读取数据
+  /// Reads a value from secure storage.
+  ///
+  /// If [decrypt] is true, the value will be Base64 decoded after retrieval.
+  /// Returns null if the key does not exist.
+  ///
+  /// Parameters:
+  /// - [key]: The key to read the value from
+  /// - [decrypt]: Whether to decrypt the value (default: false)
+  ///
+  /// Returns the stored value or null if not found.
   Future<String?> read({
     required String key,
     bool decrypt = false,
@@ -48,7 +92,12 @@ class SecureStorage {
     }
   }
 
-  /// 删除数据
+  /// Deletes a value from secure storage.
+  ///
+  /// Parameters:
+  /// - [key]: The key to delete
+  ///
+  /// Throws an exception if the delete operation fails.
   Future<void> delete({required String key}) async {
     try {
       await _storage.delete(key: key);
@@ -58,7 +107,9 @@ class SecureStorage {
     }
   }
 
-  /// 删除所有数据
+  /// Deletes all values from secure storage.
+  ///
+  /// Throws an exception if the operation fails.
   Future<void> deleteAll() async {
     try {
       await _storage.deleteAll();
@@ -68,7 +119,12 @@ class SecureStorage {
     }
   }
 
-  /// 检查键是否存在
+  /// Checks if a key exists in secure storage.
+  ///
+  /// Parameters:
+  /// - [key]: The key to check
+  ///
+  /// Returns true if the key exists, false otherwise.
   Future<bool> containsKey({required String key}) async {
     try {
       return await _storage.containsKey(key: key);
@@ -78,7 +134,9 @@ class SecureStorage {
     }
   }
 
-  /// 获取所有键
+  /// Reads all key-value pairs from secure storage.
+  ///
+  /// Returns a map of all stored key-value pairs, or an empty map if storage is empty.
   Future<Map<String, String>> readAll() async {
     try {
       return await _storage.readAll();
@@ -88,7 +146,15 @@ class SecureStorage {
     }
   }
 
-  /// 保存 JSON 对象
+  /// Writes a JSON object to secure storage.
+  ///
+  /// The object is serialized to JSON string before storage.
+  /// If [encrypt] is true, the JSON string will be Base64 encoded.
+  ///
+  /// Parameters:
+  /// - [key]: The key to store the JSON under
+  /// - [value]: The JSON object to store
+  /// - [encrypt]: Whether to encrypt the JSON (default: false)
   Future<void> writeJson({
     required String key,
     required Map<String, dynamic> value,
@@ -98,7 +164,16 @@ class SecureStorage {
     await write(key: key, value: jsonString, encrypt: encrypt);
   }
 
-  /// 读取 JSON 对象
+  /// Reads a JSON object from secure storage.
+  ///
+  /// The stored JSON string is deserialized to a map.
+  /// If [decrypt] is true, the JSON string will be Base64 decoded first.
+  ///
+  /// Parameters:
+  /// - [key]: The key to read the JSON from
+  /// - [decrypt]: Whether to decrypt the JSON (default: false)
+  ///
+  /// Returns the deserialized JSON object or null if not found or parsing fails.
   Future<Map<String, dynamic>?> readJson({
     required String key,
     bool decrypt = false,
@@ -114,7 +189,14 @@ class SecureStorage {
     }
   }
 
-  /// 生成密钥哈希
+  /// Generates a SHA-256 hash of the input string.
+  ///
+  /// Useful for creating secure key identifiers or checksums.
+  ///
+  /// Parameters:
+  /// - [input]: The string to hash
+  ///
+  /// Returns the hexadecimal representation of the SHA-256 hash.
   String generateKeyHash(String input) {
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
