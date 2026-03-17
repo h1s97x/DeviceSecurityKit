@@ -14,6 +14,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.0.5] - 2026-03-17
+
+#### Fixed
+
+- Fixed Web plugin class `DeviceSecurityKitWeb` missing implementation
+- Added `flutter_web_plugins` as a proper dependency for Web support
+- Fixed Android plugin loading error caused by invalid Web plugin configuration
+
 ### [1.0.4] - 2026-03-16
 
 #### Added
@@ -254,6 +262,14 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 日志格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 项目版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+
+### [1.0.5] - 2026-03-17
+
+#### 修复
+
+- 修复了 Web 插件类 `DeviceSecurityKitWeb` 缺少实现的问题
+- 添加 `flutter_web_plugins` 作为 Web 支持的正式依赖
+- 修复了由无效 Web 插件配置导致的 Android 插件加载错误
 
 ### [1.0.4] - 2026-03-16
 
