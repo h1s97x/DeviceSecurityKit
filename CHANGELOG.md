@@ -14,6 +14,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### [1.0.6] - 2026-03-29
+
+#### Fixed
+
+- Fixed Android plugin loading error caused by incorrect package name configuration
+- Updated Android package from `com.example.device_security_kit` to `dev.fluttercommunity.device_security_kit`
+- Implemented complete Android native plugin with full security detection support
+- Fixed missing Android plugin class implementation
+- Updated test files to match new package structure
+
 ### [1.0.5] - 2026-03-17
 
 #### Fixed
@@ -262,6 +272,16 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 日志格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 项目版本遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+
+### [1.0.6] - 2026-03-29
+
+#### 修复
+
+- 修复了由错误的包名配置导致的 Android 插件加载错误
+- 将 Android 包名从 `com.example.device_security_kit` 更新为 `dev.fluttercommunity.device_security_kit`
+- 实现了完整的 Android 原生插件，支持全面的安全检测
+- 修复了缺失的 Android 插件类实现
+- 更新了测试文件以匹配新的包结构
 
 ### [1.0.5] - 2026-03-17
 

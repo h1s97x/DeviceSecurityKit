@@ -1,4 +1,4 @@
-package com.example.device_security_kit
+package dev.fluttercommunity.device_security_kit
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
